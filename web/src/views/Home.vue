@@ -1,17 +1,19 @@
 <template>
   <a-layout>
+
+
     <a-layout-sider style="background: #fff" width="200">
       <a-menu
           v-model:openKeys="openKeys"
           v-model:selectedKeys="selectedKeys2"
-          :style="{ height: '100%', borderRight: 0 }"
           mode="inline"
+          :style="{ height: '100%', borderRight: 0 }"
       >
         <a-sub-menu key="sub1">
           <template #title>
               <span>
                 <user-outlined />
-                subnav 11111
+                subnav 1
               </span>
           </template>
           <a-menu-item key="1">option1</a-menu-item>
@@ -45,51 +47,49 @@
         </a-sub-menu>
       </a-menu>
     </a-layout-sider>
+
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-list :data-source="listData" :pagination="pagination" item-layout="vertical" size="large">
-        <template #footer>
-          <div>
-            <b>ant design vue</b>
-            footer part
-          </div>
-        </template>
+      <a-list :data-source="ebooks" :grid="{ gutter: 20, column: 3 }" item-layout="vertical"
+              size="large">
+
         <template #renderItem="{ item }">
-          <a-list-item key="item.title">
+
+          <a-list-item key="item.name">
+
             <template #actions>
           <span v-for="{ type, text } in actions" :key="type">
             <component v-bind:is="type" style="margin-right: 8px" />
             {{ text }}
           </span>
             </template>
-            <template #extra>
-              <img
-                  alt="logo"
-                  src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                  width="272"
-              />
-            </template>
+
             <a-list-item-meta :description="item.description">
               <template #title>
-                <a :href="item.href">{{ item.title }}</a>
+                <a :href="item.href">{{ item.name }}</a>
               </template>
-              <template #avatar><a-avatar :src="item.avatar" /></template>
+              <template #avatar><a-avatar :src="item.cover" /></template>
             </a-list-item-meta>
-            {{ item.content }}
+
           </a-list-item>
         </template>
       </a-list>
     </a-layout-content>
+
   </a-layout>
+
 </template>
 
+
 <script lang="ts">
-import { defineComponent, onMounted, ref, reactive, toRef } from 'vue';
-import axios from "axios";
+import { defineComponent,onMounted,ref,reactive,toRef } from 'vue';
+import axios from 'axios'
 import { StarOutlined, LikeOutlined, MessageOutlined } from '@ant-design/icons-vue';
 
+
 const listData: Record<string, string>[] = [];
+
 for (let i = 0; i < 23; i++) {
   listData.push({
     href: 'https://www.antdv.com/',
@@ -122,27 +122,38 @@ export default defineComponent({
       { type: 'MessageOutlined', text: '2' },
     ];
     console.log("setup");
-    const ebooks = ref()
-    const ebooks1 = reactive({books: []})
-
-    onMounted(() => {
+    const ebooks = ref();
+    const ebooks1 = reactive({books:[]});
+    onMounted(()=>{
       console.log("onMounted");
-      axios.get("http://127.0.0.1:8880/ebook/list?name=Spring").then(
-          (Response) => {
-            const data = Response.data;
-            ebooks.value = data.content;
-            ebooks1.books = data.content;
-            console.log(Response);
-          }
-      );
-    })
-    return {
+      axios.get("/ebook/list").then(function (response) {
+        // 把响应里的data拿出来
+        const data = response.data;
+        ebooks.value = data.content;//content是电子书列表
+        ebooks1.books = data.content;
+        console.log(response);
+      });
+
+    });
+
+    return{
       ebooks,
-      ebooks2: toRef(ebooks1, "books"),
+      ebooks2: toRef(ebooks1,"books"),
       listData,
       pagination,
       actions,
-    }
+    };
   }
+
 });
 </script>
+
+<style scoped>
+.ant-avatar {
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  border-radius: 8%;
+  margin: 5px 0;
+}
+</style>
