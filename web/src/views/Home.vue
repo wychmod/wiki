@@ -121,17 +121,14 @@ export default defineComponent({
       { type: 'LikeOutlined', text: '156' },
       { type: 'MessageOutlined', text: '2' },
     ];
-    console.log("setup");
     const ebooks = ref();
     const ebooks1 = reactive({books:[]});
     onMounted(()=>{
-      console.log("onMounted");
       axios.get("/ebook/list").then(function (response) {
         // 把响应里的data拿出来
         const data = response.data;
         ebooks.value = data.content;//content是电子书列表
         ebooks1.books = data.content;
-        console.log(response);
       });
 
     });
