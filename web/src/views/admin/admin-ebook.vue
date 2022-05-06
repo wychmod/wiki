@@ -5,18 +5,17 @@
     >
       <a-table
           :columns="columns"
-          :pagination="pagination"
           :data-source="ebooks"
           :row-key="record => record.id"
+          :pagination="pagination"
           :loading="loading"
           @change="handleTableChange"
       >
         <template #cover="{ text: cover }">
           <div class="myimg">
-            <img  v-if="cover" :src="cover" alt="avatar"  />
+            <img v-if="cover" :src="cover" alt="avatar"/>
           </div>
         </template>
-
         <template v-slot:action="{ text, record }">
           <a-space size="small">
             <a-button type="primary" @click="edit(record)">
@@ -30,10 +29,35 @@
       </a-table>
     </a-layout-content>
   </a-layout>
+
+  <a-modal
+      v-model:visible="modalVisible"
+      :confirm-loading="modalLoading"
+      title="电子书表单"
+      @ok="handleModalOk"
+  >
+    <a-form :label-col="{ span: 6 }" :model="ebook" :wrapper-col="{ span: 18 }">
+      <a-form-item label="封面">
+        <a-input v-model:value="ebook.cover" />
+      </a-form-item>
+      <a-form-item label="名称">
+        <a-input v-model:value="ebook.name" />
+      </a-form-item>
+      <a-form-item label="分类一">
+        <a-input v-model:value="ebook.category1Id"/>
+      </a-form-item>
+      <a-form-item label="分类二">
+        <a-input v-model:value="ebook.category2Id"/>
+      </a-form-item>
+      <a-form-item label="描述">
+        <a-input v-model:value="ebook.desc" type="textarea" />
+      </a-form-item>
+    </a-form>
+  </a-modal>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 
 export default defineComponent({
@@ -51,7 +75,7 @@ export default defineComponent({
       {
         title: '封面',
         dataIndex: 'cover',
-        slots: { customRender: 'cover' }
+        slots: {customRender: 'cover'}
       },
       {
         title: '名称',
@@ -80,7 +104,7 @@ export default defineComponent({
       {
         title: 'Action',
         key: 'action',
-        slots: { customRender: 'action' }
+        slots: {customRender: 'action'}
       }
     ];
 
@@ -91,15 +115,14 @@ export default defineComponent({
       loading.value = true;
       // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
       axios.get("/ebook/list", {
-        params:{
-          page:params.page,
-          size:params.size
+        params: {
+          page: params.page,
+          size: params.size
         }
       }).then((response) => {
-
         loading.value = false;
         const data = response.data;
-        ebooks.value = data.content.list
+        ebooks.value = data.content.list;
 
         // 重置分页按钮
         pagination.value.current = params.page;
@@ -118,10 +141,30 @@ export default defineComponent({
       });
     };
 
+    // -------- 表单 ---------
+    const ebook=ref({})
+    const modalVisible = ref(false);
+    const modalLoading = ref(false);
+    const handleModalOk = () => {
+      modalLoading.value = true;
+      setTimeout(() => {
+        modalVisible.value = false;
+        modalLoading.value = false;
+      }, 2000);
+    };
+
+    /**
+     * 编辑
+     */
+    const edit = (record:any) => {
+      modalVisible.value = true;
+      ebook.value=record
+    };
+
     onMounted(() => {
       handleQuery({
-        page:1,
-        size:pagination.value.pageSize
+        page: 1,
+        size: pagination.value.pageSize,
       });
     });
 
@@ -130,11 +173,16 @@ export default defineComponent({
       pagination,
       columns,
       loading,
-      handleTableChange
+      handleTableChange,
+
+      edit,
+      ebook,
+      modalVisible,
+      modalLoading,
+      handleModalOk
     }
   }
 });
-
 </script>
 
 <style scoped>
@@ -142,6 +190,7 @@ export default defineComponent({
   width: 15%;
   height: 15%;
 }
+
 img {
   width: 100%;
   height: 100%;
