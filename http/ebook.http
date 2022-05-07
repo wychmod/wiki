@@ -1,5 +1,8 @@
-GET http://127.0.0.1:8880/ebook/list?page=1&size=4
-Accept: application/json
+DELETE http://localhost:8880/ebook/delete/177801412103770112
+
+
+###
+GET http://localhost:8880/ebook/list?page=1&size=100
 
 ###
 GET http://127.0.0.1:8880/ebook/list?name=Spring
