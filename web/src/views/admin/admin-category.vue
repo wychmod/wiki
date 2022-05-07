@@ -31,9 +31,9 @@
               编辑
             </a-button>
             <a-popconfirm
+                title="删除后不可恢复，确认删除?"
                 cancel-text="否"
                 ok-text="是"
-                title="删除后不可恢复，确认删除?"
                 @confirm="handleDelete(record.id)"
             >
               <a-button type="danger">
@@ -58,7 +58,13 @@
         <a-input v-model:value="category.name"/>
       </a-form-item>
       <a-form-item label="父分类">
-        <a-input v-model:value="category.parent"/>
+        <a-select
+            ref="select"
+            v-model:value="category.parent"
+        >
+          <a-select-option value="0">无</a-select-option>
+          <a-select-option v-for="c in level1" :key="c.id" :disabled="category.id===c.id" :value="c.id">{{ c.name }}</a-select-option>
+        </a-select>
       </a-form-item>
       <a-form-item label="顺序">
         <a-input v-model:value="category.sort" />
