@@ -25,9 +25,9 @@
               编辑
             </a-button>
             <a-popconfirm
+                title="删除后不可恢复，确认删除?"
                 cancel-text="否"
                 ok-text="是"
-                title="删除后不可恢复，确认删除?"
                 @confirm="handleDelete(record.id)"
             >
               <a-button type="danger">
@@ -158,15 +158,17 @@ export default defineComponent({
     const handleModalOk = () => {
       modalLoading.value = true;
       axios.post("/ebook/save",ebook.value).then((response) => {
+        modalLoading.value = false;
         const data = response.data;
         if (data.success) {
           modalVisible.value = false;
-          modalLoading.value = false;
           //重新加载列表
           handleQuery({
             page: pagination.value.current,
             size: pagination.value.pageSize,
-          })
+          });
+        } else {
+          message.error(data.message)
         }
       });
     };
