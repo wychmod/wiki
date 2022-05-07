@@ -63,12 +63,21 @@ create table `category` (
                             primary key (`id`)
 ) engine=innodb default charset=utf8mb4 comment= '电子书分类';
 
-insert into `category` (id, parent, name, sort) values (100, 000, '前端开发', 100);
-insert into `category` (id, parent, name, sort) values (101, 100, 'Vue', 101);
-insert into `category` (id, parent, name, sort) values (102, 100, 'Vue', 102);
-insert into `category` (id, parent, name, sort) values (200, 000, 'Vue', 200);
-insert into `category` (id, parent, name, sort) values (201, 200, 'Vue', 201);
-insert into `category` (id, parent, name, sort) values (202, 200, 'Vue', 202);
+insert into `category` (id, parent, name, sort) VALUES (100, 000, '前端开发', 100);
+insert into `category` (id, parent, name, sort) VALUES (101, 100, 'Vue', 101);
+insert into `category` (id, parent, name, sort) VALUES (102, 100, 'HTML & CSS', 102);
+insert into `category` (id, parent, name, sort) VALUES (200, 000, 'Java', 200);
+insert into `category` (id, parent, name, sort) VALUES (201, 200, '基础应用', 201);
+insert into `category` (id, parent, name, sort) VALUES (202, 200, '框架应用', 202);
+insert into `category` (id, parent, name, sort) VALUES (300, 000, 'Python', 300);
+insert into `category` (id, parent, name, sort) VALUES (301, 300, '基础应用', 301);
+insert into `category` (id, parent, name, sort) VALUES (302, 300, '进阶方向应用', 302);
+insert into `category` (id, parent, name, sort) VALUES (400, 000, '数据库', 400);
+insert into `category` (id, parent, name, sort) VALUES (401, 400, 'MySQL', 401);
+insert into `category` (id, parent, name, sort) VALUES (500, 000, '其它', 500);
+insert into `category` (id, parent, name, sort) VALUES (501, 500, '服务器', 501);
+insert into `category` (id, parent, name, sort) VALUES (502, 500, '开发工具', 502);
+insert into `category` (id, parent, name, sort) VALUES (503, 500, '热门服务端语言', 503);
 
 
 
