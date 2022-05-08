@@ -31,9 +31,9 @@
               编辑
             </a-button>
             <a-popconfirm
-                cancel-text="否"
                 ok-text="是"
                 title="删除后不可恢复，确认删除?"
+                cancel-text="否"
                 @confirm="handleDelete(record.id)"
             >
               <a-button type="danger">
@@ -62,9 +62,9 @@
             :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
             v-model:value="doc.parent"
             :replaceFields="{title:'name',key:'id',value:'id'}"
+            style="width: 100%"
             :tree-data="treeSelectData"
             placeholder="请选择父文档"
-            style="width: 100%"
             tree-default-expand-all
         >
         </a-tree-select>
@@ -81,9 +81,11 @@ import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 import {message} from "ant-design-vue";
 import {Tool} from "@/util/tool";
+import { useRoute } from 'vue-router';
 export default defineComponent({
   name: 'AdminDoc',
   setup() {
+    const route = useRoute();
     const param = ref();
     const level1 = ref();
     param.value = {};
@@ -195,7 +197,9 @@ export default defineComponent({
      */
     const add = () => {
       modalVisible.value = true;
-      doc.value = {}
+      doc.value = {
+        ebookId:route.query.ebookId
+      }
       treeSelectData.value=Tool.copy(level1.value)
       //为选择树添加一个"无"
       treeSelectData.value.unshift({id:0,name:'无'})
