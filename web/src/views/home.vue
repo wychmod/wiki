@@ -77,26 +77,32 @@ export default defineComponent({
         }
       });
     };
-    const handleClick = (value:any) => {
-      // if (value.key === 'welcome') {
-      //   isShowWelcome.value = true;
-      // } else {
-      //   isShowWelcome.value = false;
-      // }
-      isShowWelcome.value=value.key==='welcome'
-    };
-    const isShowWelcome=ref(true)
-    onMounted(() => {
-      handleQueryCategory();
+    const handleQueryEbook=()=>{
       axios.get("/ebook/list", {
         params: {
           page: 1,
-          size: 1000
+          size: 1000,
+          categoryId2: categoryId2
         }
       }).then((response) => {
         const data = response.data;
         ebooks.value = data.content.list;
       });
+    }
+    const isShowWelcome=ref(true)
+    let categoryId2=0
+    const handleClick = (value:any) => {
+      if (value.key === 'welcome') {
+        isShowWelcome.value = true;
+      } else {
+        categoryId2=value.key
+        isShowWelcome.value = false;
+        handleQueryEbook()
+      }
+    };
+    onMounted(() => {
+      handleQueryCategory();
+      // handleQueryEbook()
     });
     return {
       isShowWelcome,

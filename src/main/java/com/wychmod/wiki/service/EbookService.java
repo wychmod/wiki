@@ -35,6 +35,9 @@ public class EbookService {
         if (!ObjectUtils.isEmpty(req.getName())){
             criteria.andNameLike("%"+req.getName()+"%");
         }
+        if (!ObjectUtils.isEmpty(req.getCategoryId2())){
+            criteria.andCategory2IdEqualTo(req.getCategoryId2());
+        }
         // 分页 pagenum查第几页 pagesize查几条 一条pagehelper只对遇见的第一个查询有效
         PageHelper.startPage(req.getPage(), req.getSize());
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);

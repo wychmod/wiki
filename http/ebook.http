@@ -13,3 +13,6 @@ GET http://127.0.0.1:8880/ebook/list?name=Spring
 Accept: application/json
 
 ###
+GET http://localhost:8880/ebook/list?categoryId2=401
+
+###
