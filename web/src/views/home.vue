@@ -2,116 +2,119 @@
   <a-layout>
     <a-layout-sider style="background: #fff" width="200">
       <a-menu
-          v-model:openKeys="openKeys"
-          v-model:selectedKeys="selectedKeys2"
           mode="inline"
           :style="{ height: '100%', borderRight: 0 }"
+          @click="handleClick"
       >
-        <a-sub-menu key="sub1">
-          <template #title>
-              <span>
-                <user-outlined/>
-                subnav 1111
-              </span>
+        <a-menu-item key="welcome">
+          <MailOutlined />
+          <span>欢迎</span>
+        </a-menu-item>
+        <a-sub-menu v-for="item in level1" :key="item.id">
+          <template v-slot:title>
+            <span><user-outlined />{{item.name}}</span>
           </template>
-          <a-menu-item key="1">option1</a-menu-item>
-          <a-menu-item key="2">option2</a-menu-item>
-          <a-menu-item key="3">option3</a-menu-item>
-          <a-menu-item key="4">option4</a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu key="sub2">
-          <template #title>
-              <span>
-                <laptop-outlined/>
-                subnav 2
-              </span>
-          </template>
-          <a-menu-item key="5">option5</a-menu-item>
-          <a-menu-item key="6">option6</a-menu-item>
-          <a-menu-item key="7">option7</a-menu-item>
-          <a-menu-item key="8">option8</a-menu-item>
-        </a-sub-menu>
-        <a-sub-menu key="sub3">
-          <template #title>
-              <span>
-                <notification-outlined/>
-                subnav 3
-              </span>
-          </template>
-          <a-menu-item key="9">option9</a-menu-item>
-          <a-menu-item key="10">option10</a-menu-item>
-          <a-menu-item key="11">option11</a-menu-item>
-          <a-menu-item key="12">option12</a-menu-item>
+          <a-menu-item v-for="child in item.children" :key="child.id">
+            <MailOutlined /><span>{{child.name}}</span>
+          </a-menu-item>
         </a-sub-menu>
       </a-menu>
     </a-layout-sider>
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-list :data-source="ebooks" :grid="{ gutter: 20, column: 3 }" item-layout="vertical" size="large">
+      <div v-show="isShowWelcome" class="welcome">
+        <h1>欢迎使用my-wiki</h1>
+      </div>
+      <a-list v-show="!isShowWelcome" :data-source="ebooks" :grid="{ gutter: 20, column: 3 }" item-layout="vertical" size="large">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
             <template #actions>
               <span v-for="{ type, text } in actions" :key="type">
-                <component v-bind:is="type" style="margin-right: 8px"/>
+                <component v-bind:is="type" style="margin-right: 8px" />
                 {{ text }}
               </span>
             </template>
-
             <a-list-item-meta :description="item.description">
               <template #title>
                 <a :href="item.href">{{ item.name }}</a>
               </template>
-              <template #avatar>
-                <a-avatar :src="item.cover"/>
-              </template>
+              <template #avatar><a-avatar :src="item.cover" /></template>
             </a-list-item-meta>
           </a-list-item>
         </template>
       </a-list>
-
     </a-layout-content>
   </a-layout>
 </template>
 
 <script lang="ts">
+import { defineComponent, onMounted, ref, reactive, toRef} from 'vue';
 import axios from 'axios';
-import {defineComponent, onMounted, ref} from 'vue';
-
+import { message } from 'ant-design-vue';
+import {Tool} from "@/util/tool";
+const listData: any = [];
 export default defineComponent({
   name: 'Home',
-  components: {},
   setup() {
-    const ebooks = ref()
+    const ebooks = ref();
+    const level1 =  ref();
+    let categorys: any;
+    /**
+     * 查询所有分类
+     **/
+    const handleQueryCategory = () => {
+      axios.get("/category/all").then((response) => {
+        const data = response.data;
+        if (data.success) {
+          categorys = data.content;
+          console.log("原始数组：", categorys);
+          level1.value = [];
+          level1.value = Tool.array2Tree(categorys, 0);
+          console.log("树形结构：", level1.value);
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+    const handleClick = (value:any) => {
+      // if (value.key === 'welcome') {
+      //   isShowWelcome.value = true;
+      // } else {
+      //   isShowWelcome.value = false;
+      // }
+      isShowWelcome.value=value.key==='welcome'
+    };
+    const isShowWelcome=ref(true)
     onMounted(() => {
+      handleQueryCategory();
       axios.get("/ebook/list", {
         params: {
           page: 1,
           size: 1000
         }
-      }).then(response => {
-        const data = response.data
-        ebooks.value = data.content.list
-      })
-    })
-
-
+      }).then((response) => {
+        const data = response.data;
+        ebooks.value = data.content.list;
+      });
+    });
     return {
+      isShowWelcome,
       ebooks,
       pagination: {
-        onChange: (page: number) => {
+        onChange: (page: any) => {
           console.log(page);
         },
         pageSize: 3,
       },
       actions: [
-        {type: 'StarOutlined', text: '156'},
-        {type: 'LikeOutlined', text: '156'},
-        {type: 'MessageOutlined', text: '2'},
-      ]
+        { type: 'StarOutlined', text: '156' },
+        { type: 'LikeOutlined', text: '156' },
+        { type: 'MessageOutlined', text: '2' },
+      ],
+      handleClick,
+      level1,
     }
-
-
   }
 });
 </script>
