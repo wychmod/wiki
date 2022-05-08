@@ -2,7 +2,7 @@ GET http://localhost:8880/category/all
 Accept: application/json
 
 ###
-DELETE http://localhost:8880/ebook/delete/177801412103770112
+DELETE http://localhost:8880/doc/delete/1,2,3
 
 
 ###
