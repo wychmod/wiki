@@ -123,6 +123,8 @@ export default defineComponent({
     param.value = {};
     const docs = ref();
     const loading = ref(false);
+    const treeSelectData = ref();
+    treeSelectData.value = [];
     const columns = [
       {
         title: '名称',
@@ -164,14 +166,16 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(docs.value, 0);
           console.log("树形结构：", level1);
+          //父文档下拉框初始化，相当于点击新增
+          treeSelectData.value=Tool.copy(level1.value)
+          //为选择树添加一个“无”
+          treeSelectData.value.unshift({id:0,name:'无'})
         } else {
           message.error(data.message);
         }
       });
     };
     // -------- 表单 ---------
-    const treeSelectData = ref();
-    treeSelectData.value = [];
     const doc = ref();
     doc.value={}
     const modalVisible = ref(false);
