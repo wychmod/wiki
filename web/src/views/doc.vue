@@ -1,6 +1,7 @@
 <template>
   <a-layout>
     <a-layout-content style="background: #fff;padding: 24px;margin: 0;min-height: 200px">
+      <h3 v-if="level1.length===0">对不起，找不到相关文档！</h3>
       <a-row>
         <a-col :span="6">
           <a-tree
