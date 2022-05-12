@@ -6,8 +6,9 @@
           <a-tree
               v-if="level1.length>0"
               :tree-data="level1"
-              :defaultExpandAll="true"
+              :defaultSelectedKeys="defaultSelectedKeys"
               :replace-fields="{title: 'name',key: 'id',children: 'children'}"
+              :defaultExpandAll="true"
               @select="onSelect"
           >
           </a-tree>
@@ -29,21 +30,11 @@ import {useRoute} from "vue-router";
 export default defineComponent({
   name: 'doc',
   setup: function () {
-    const html = ref()
-    const level1 = ref();
-    level1.value = [];
     const route = new useRoute()
-    const handleQuery = () => {
-      axios.get("/doc/all/" + route.query.ebookId).then((response) => {
-        const data = response.data;
-        if (data.success) {
-          level1.value = Tool.array2Tree(data.content, 0);
-          console.log(level1.value);
-        } else {
-          message.error(data.message);
-        }
-      })
-    }
+    const html = ref()
+    const docs=ref()
+    const defaultSelectedKeys=ref()
+    defaultSelectedKeys.value=[]
     /**
      * 内容查询
      **/
@@ -57,6 +48,24 @@ export default defineComponent({
         }
       });
     };
+    const level1 = ref();
+    level1.value=[]
+    const handleQuery = () => {
+      axios.get("/doc/all/" + route.query.ebookId).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          docs.value=data.content
+          level1.value=[]
+          level1.value = Tool.array2Tree(docs.value, 0);
+          if (Tool.isNotEmpty(level1)) {
+            defaultSelectedKeys.value=[level1.value[0].id]
+            handleQueryContent(level1.value[0].id)
+          }
+        } else {
+          message.error(data.message);
+        }
+      })
+    }
     const onSelect = (selectedKeys: any, info: any) => {
       if (Tool.isNotEmpty(selectedKeys)) {
         handleQueryContent(selectedKeys[0])
@@ -68,6 +77,7 @@ export default defineComponent({
     return {
       level1,
       html,
+      defaultSelectedKeys,
       onSelect
     }
   }
