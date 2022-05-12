@@ -39,8 +39,8 @@
                 </a-button>
                 <a-popconfirm
                     title="删除后不可恢复，确认删除?"
-                    cancel-text="否"
                     ok-text="是"
+                    cancel-text="否"
                     @confirm="handleDelete(record.id)"
                 >
                   <a-button size="small" type="danger">
@@ -256,11 +256,25 @@ export default defineComponent({
       }
     };
     /**
+     * 内容查询
+     **/
+    const handleQueryContent = () => {
+      axios.get("/doc/find-content/"+doc.value.id).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          editor.txt.html(data.content)
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+    /**
      * 编辑
      */
     const edit = (record: any) => {
       modalVisible.value = true;
       doc.value = Tool.copy(record);
+      handleQueryContent()
       // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
       treeSelectData.value = Tool.copy(level1.value);
       setDisable(treeSelectData.value, record.id);

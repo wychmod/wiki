@@ -2,8 +2,8 @@ package com.wychmod.wiki.controller;
 
 import com.wychmod.wiki.req.DocQueryReq;
 import com.wychmod.wiki.req.DocSaveReq;
-import com.wychmod.wiki.resp.DocQueryResp;
 import com.wychmod.wiki.resp.CommonResp;
+import com.wychmod.wiki.resp.DocQueryResp;
 import com.wychmod.wiki.resp.PageResp;
 import com.wychmod.wiki.service.DocService;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +47,14 @@ public class DocController {
         CommonResp resp = new CommonResp<>();
         List<String> list = Arrays.asList(idStr.split(","));
         docService.delete(list);
+        return resp;
+    }
+
+    @GetMapping ("/find-content/{id}")
+    public CommonResp findContent(@PathVariable long id) {
+        CommonResp<String> resp = new CommonResp<>();
+        String content = docService.findContent(id);
+        resp.setContent(content);
         return resp;
     }
 }
