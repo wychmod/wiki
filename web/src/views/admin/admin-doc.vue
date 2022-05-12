@@ -22,12 +22,12 @@
           <a-table
               v-if="level1.length>0"
               :columns="columns"
-              :data-source="level1"
               :defaultExpandAllRows="true"
+              :data-source="level1"
               :loading="loading"
               :pagination=false
-              :row-key="record => record.id"
               size="small"
+              :row-key="record => record.id"
           >
             <template #name="{ text,record }">
               {{record.sort}} {{text}}
@@ -38,9 +38,9 @@
                   编辑
                 </a-button>
                 <a-popconfirm
+                    title="删除后不可恢复，确认删除?"
                     cancel-text="否"
                     ok-text="是"
-                    title="删除后不可恢复，确认删除?"
                     @confirm="handleDelete(record.id)"
                 >
                   <a-button size="small" type="danger">
@@ -68,12 +68,12 @@
             <a-form-item >
               <a-tree-select
                   v-model:value="doc.parent"
-                  :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
                   :replaceFields="{title: 'name', key: 'id', value: 'id'}"
+                  :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
                   :tree-data="treeSelectData"
                   placeholder="请选择父文档"
-                  style="width: 100%"
                   tree-default-expand-all
+                  style="width: 100%"
               >
               </a-tree-select>
             </a-form-item>
@@ -172,13 +172,15 @@ export default defineComponent({
     // -------- 表单 ---------
     const treeSelectData = ref();
     treeSelectData.value = [];
-    const doc = ref({});
+    const doc = ref();
+    doc.value={}
     const modalVisible = ref(false);
     const modalLoading = ref(false);
     const editor = new E('#content')
     editor.config.zIndex=0
     const handleSave = () => {
       modalLoading.value = true;
+      doc.value.content=editor.txt.html()
       axios.post("/doc/save", doc.value).then((response) => {
         modalLoading.value = false;
         const data = response.data; // data = commonResp
