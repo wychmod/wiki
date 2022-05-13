@@ -23,9 +23,9 @@
       </p>
       <a-table
           :columns="columns"
-          :pagination="pagination"
-          :data-source="users"
           :row-key="record => record.id"
+          :data-source="users"
+          :pagination="pagination"
           :loading="loading"
           @change="handleTableChange"
       >
@@ -43,9 +43,9 @@
               编辑
             </a-button>
             <a-popconfirm
+                title="删除后不可恢复，确认删除?"
                 cancel-text="否"
                 ok-text="是"
-                title="删除后不可恢复，确认删除?"
                 @confirm="handleDelete(record.id)"
             >
               <a-button type="danger">
@@ -67,7 +67,7 @@
   >
     <a-form :label-col="{ span: 6 }" :model="user" :wrapper-col="{ span: 18 }">
       <a-form-item label="登陆名">
-        <a-input v-model:value="user.loginName" />
+        <a-input v-model:value="user.loginName" :disabled="!!user.id"/>
       </a-form-item>
       <a-form-item label="昵称">
         <a-input v-model:value="user.name" />
@@ -92,7 +92,7 @@ export default defineComponent({
     const users = ref()
     const pagination = ref({
       current: 1,
-      pageSize: 4,
+      pageSize: 8,
       total: 0
     });
     const loading = ref(false);
