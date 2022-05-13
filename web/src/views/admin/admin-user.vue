@@ -23,10 +23,10 @@
       </p>
       <a-table
           :columns="columns"
-          :data-source="users"
-          :loading="loading"
           :pagination="pagination"
+          :data-source="users"
           :row-key="record => record.id"
+          :loading="loading"
           @change="handleTableChange"
       >
         <template #cover="{ text: cover }">
@@ -60,9 +60,9 @@
   </a-layout>
 
   <a-modal
+      title="用户表单"
       v-model:visible="modalVisible"
       :confirm-loading="modalLoading"
-      title="用户表单"
       @ok="handleModalOk"
   >
     <a-form :label-col="{ span: 6 }" :model="user" :wrapper-col="{ span: 18 }">
@@ -158,8 +158,6 @@ export default defineComponent({
     const modalLoading = ref(false);
     const handleModalOk = () => {
       modalLoading.value = true;
-      user.value.category1Id = categoryIds.value[0];
-      user.value.category2Id = categoryIds.value[1];
       axios.post("/user/save", user.value).then((response) => {
         modalLoading.value = false;
         const data = response.data;
