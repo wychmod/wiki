@@ -31,7 +31,7 @@ import {useRoute} from "vue-router";
 export default defineComponent({
   name: 'doc',
   setup: function () {
-    const route = new useRoute()
+    const route = useRoute()
     const html = ref()
     const docs=ref()
     const defaultSelectedKeys=ref()

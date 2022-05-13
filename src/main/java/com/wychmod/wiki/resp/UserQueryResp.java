@@ -1,6 +1,6 @@
-package com.wychmod.wiki.domain;
+package com.wychmod.wiki.resp;
 
-public class User {
+public class UserQueryResp {
     private Long id;
 
     private String loginName;
