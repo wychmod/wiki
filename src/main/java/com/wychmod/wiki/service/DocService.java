@@ -7,6 +7,7 @@ import com.wychmod.wiki.domain.Doc;
 import com.wychmod.wiki.domain.DocExample;
 import com.wychmod.wiki.mapper.ContentMapper;
 import com.wychmod.wiki.mapper.DocMapper;
+import com.wychmod.wiki.mapper.DocMapperCust;
 import com.wychmod.wiki.req.DocQueryReq;
 import com.wychmod.wiki.req.DocSaveReq;
 import com.wychmod.wiki.resp.DocQueryResp;
@@ -32,6 +33,9 @@ public class DocService {
 
     @Resource
     private SnowFlake snowFlake;
+
+    @Resource
+    private DocMapperCust docMapperCust;
 
     public List<DocQueryResp> all(long ebookId) {
         DocExample docExample = new DocExample();
@@ -72,6 +76,8 @@ public class DocService {
         if (ObjectUtils.isEmpty(req.getId())){
             // 新增
             doc.setId(snowFlake.nextId());
+            doc.setViewCount(0);
+            doc.setVoteCount(0);
             docMapper.insert(doc);
             content.setId(doc.getId());
             contentMapper.insert(content);
@@ -99,6 +105,8 @@ public class DocService {
 
     public String findContent(long id) {
         Content content = contentMapper.selectByPrimaryKey(id);
+        // 文档阅读数+1
+        docMapperCust.increaseViewCount(id);
         if (!ObjectUtils.isEmpty(content)) {
             return content.getContent();
         }
