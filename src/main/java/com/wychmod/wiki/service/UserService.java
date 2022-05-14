@@ -8,6 +8,7 @@ import com.wychmod.wiki.exception.BusinessException;
 import com.wychmod.wiki.exception.BusinessExceptionCode;
 import com.wychmod.wiki.mapper.UserMapper;
 import com.wychmod.wiki.req.UserQueryReq;
+import com.wychmod.wiki.req.UserResetPasswordReq;
 import com.wychmod.wiki.req.UserSaveReq;
 import com.wychmod.wiki.resp.PageResp;
 import com.wychmod.wiki.resp.UserQueryResp;
@@ -74,6 +75,11 @@ public class UserService {
             user.setPassword(null);
             userMapper.updateByPrimaryKeySelective(user);
         }
+    }
+
+    public void resetPassword(UserResetPasswordReq req) {
+        User user = CopyUtil.copy(req, User.class);
+        userMapper.updateByPrimaryKeySelective(user);
     }
 
     public void delete(long id) {
