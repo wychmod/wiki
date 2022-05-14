@@ -3,8 +3,8 @@
     <div class="logo" />
     <a-menu
         theme="dark"
-        :style="{ lineHeight: '64px' }"
         mode="horizontal"
+        :style="{ lineHeight: '64px' }"
     >
       <a-menu-item key="/">
         <router-link to="/">首页</router-link>
@@ -27,9 +27,9 @@
     </a-menu>
 
     <a-modal
+        title="登录"
         v-model:visible="loginModalVisible"
         :confirm-loading="loginModalLoading"
-        title="登录"
         @ok="login"
     >
       <a-form :label-col="{ span: 6 }" :model="user" :wrapper-col="{ span: 18 }">
@@ -48,6 +48,10 @@
 
 <script lang="ts">
 import {defineComponent, ref} from "vue";
+import {message} from "ant-design-vue";
+import axios from "axios";
+declare let hexMd5:any
+declare let KEY:any
 export default defineComponent({
   name: "the-header",
   setup(){
@@ -63,21 +67,19 @@ export default defineComponent({
       // user.value = Tool.copy(record)
     }
     const login=()=>{
-      console.log("开始登录")
+      loginModalLoading.value = true;
+      user.value.password=hexMd5(user.value.password+KEY)
+      axios.post("/user/login", user.value).then((response) => {
+        loginModalLoading.value = false;
+        const data = response.data;
+        if (data.success) {
+          loginModalVisible.value = false;
+          message.success("登录成功！")
+        } else {
+          message.error(data.message)
+        }
+      });
     }
-    // const handleLoginModalOk = () => {
-    //   loginModalLoading.value = true;
-    //
-    //   axios.post("/user/login", user.value).then((response) => {
-    //     loginModalLoading.value = false;
-    //     const data = response.data;
-    //     if (data.success) {
-    //       loginModalVisible.value = false;
-    //     } else {
-    //       message.error(data.message)
-    //     }
-    //   });
-    // };
     return{
       loginModalVisible,
       loginModalLoading,
