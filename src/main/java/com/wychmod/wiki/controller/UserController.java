@@ -65,9 +65,17 @@ public class UserController {
         Long token = snowFlake.nextId();
         LOG.info("生成单点登录 token:{}，并放入 redis 中", token);
         userLoginResp.setToken(token.toString());
-        redisTemplate.opsForValue().set(token, JSONObject.toJSONString(userLoginResp));
+        redisTemplate.opsForValue().set(token.toString(), JSONObject.toJSONString(userLoginResp));
 
         resp.setContent(userLoginResp);
+        return resp;
+    }
+
+    @GetMapping ("/delete/{token}")
+    public CommonResp logout(@PathVariable String token) {
+        CommonResp resp = new CommonResp<>();
+        redisTemplate.delete(token);
+        LOG.info("从 redis 中删除 token：{}",token);
         return resp;
     }
 
