@@ -30,9 +30,7 @@
           @change="handleTableChange"
       >
         <template #cover="{ text: cover }">
-          <div class="myimg">
-            <img v-if="cover" :src="cover" alt="avatar"/>
-          </div>
+          <img v-if="cover" :src="cover" alt="avatar"/>
         </template>
         <template v-slot:category="{text,record}">
           <span>{{ getCategoryName(record.category1Id) }}/{{ getCategoryName(record.category2Id) }}</span>
@@ -287,14 +285,3 @@ export default defineComponent({
   }
 });
 </script>
-
-<style scoped>
-.myimg {
-  width: 15%;
-  height: 15%;
-}
-img {
-  width: 100%;
-  height: 100%;
-}
-</style>

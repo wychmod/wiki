@@ -21,7 +21,10 @@
       <a-menu-item key="/about">
         <router-link to="/about">关于我们</router-link>
       </a-menu-item>
-      <a class="login-menu" @click="showLoginModal">
+      <a v-show="user.id" class="login-menu">
+        <span>你好，{{ user.name }}</span>
+      </a>
+      <a v-show="!user.id" class="login-menu" @click="showLoginModal">
         <span>登录</span>
       </a>
     </a-menu>
@@ -32,69 +35,73 @@
         :confirm-loading="loginModalLoading"
         @ok="login"
     >
-      <a-form :label-col="{ span: 6 }" :model="user" :wrapper-col="{ span: 18 }">
-        <a-form-item label="登陆名">
-          <a-input v-model:value="user.loginName" />
+      <a-form :label-col="{ span: 6 }" :model="loginUser" :wrapper-col="{ span: 18 }">
+        <a-form-item label="登录名">
+          <a-input v-model:value="loginUser.loginName" />
         </a-form-item>
-
-        <a-form-item label="密码" >
-          <a-input v-model:value="user.password"/>
+        <a-form-item label="密码">
+          <a-input v-model:value="loginUser.password" type="password" />
         </a-form-item>
       </a-form>
     </a-modal>
   </a-layout-header>
 </template>
 
-
 <script lang="ts">
-import {defineComponent, ref} from "vue";
-import {message} from "ant-design-vue";
-import axios from "axios";
-declare let hexMd5:any
-declare let KEY:any
+import { defineComponent, ref } from 'vue';
+import axios from 'axios';
+import { message } from 'ant-design-vue';
+declare let hexMd5: any;
+declare let KEY: any;
 export default defineComponent({
-  name: "the-header",
-  setup(){
-    // -------- 表单 ---------
-    const user = ref({
-      loginName:"test",
-      password:"test"
+  name: 'the-header',
+  setup () {
+    // 用来登录后保存
+    const user = ref();
+    user.value = {};  // 初始化一个空对象防止空指针
+    // 用来登录
+    const loginUser = ref({
+      loginName: "test",
+      password: "test123"
     });
     const loginModalVisible = ref(false);
     const loginModalLoading = ref(false);
-    const showLoginModal=()=>{
+    const showLoginModal = () => {
       loginModalVisible.value = true;
-      // user.value = Tool.copy(record)
-    }
-    const login=()=>{
+    };
+    // 登录
+    const login = () => {
+      console.log("开始登录");
       loginModalLoading.value = true;
-      user.value.password=hexMd5(user.value.password+KEY)
-      axios.post("/user/login", user.value).then((response) => {
+      loginUser.value.password = hexMd5(loginUser.value.password + KEY);
+      axios.post('/user/login', loginUser.value).then((response) => {
         loginModalLoading.value = false;
         const data = response.data;
         if (data.success) {
           loginModalVisible.value = false;
-          message.success("登录成功！")
+          message.success("登录成功！");
+          user.value = data.content;
         } else {
-          message.error(data.message)
+          message.error(data.message);
         }
       });
-    }
-    return{
+    };
+    return {
       loginModalVisible,
       loginModalLoading,
-      user,
+      showLoginModal,
+      loginUser,
       login,
-      showLoginModal
+      user
     }
   }
-})
+});
 </script>
 
 <style>
 .login-menu {
+  float: right;
   color: white;
-  margin-left: 800px;
-  order: 999;
+  margin-right: 50px;
 }
 </style>
