@@ -7,10 +7,12 @@ import com.wychmod.wiki.domain.UserExample;
 import com.wychmod.wiki.exception.BusinessException;
 import com.wychmod.wiki.exception.BusinessExceptionCode;
 import com.wychmod.wiki.mapper.UserMapper;
+import com.wychmod.wiki.req.UserLoginReq;
 import com.wychmod.wiki.req.UserQueryReq;
 import com.wychmod.wiki.req.UserResetPasswordReq;
 import com.wychmod.wiki.req.UserSaveReq;
 import com.wychmod.wiki.resp.PageResp;
+import com.wychmod.wiki.resp.UserLoginResp;
 import com.wychmod.wiki.resp.UserQueryResp;
 import com.wychmod.wiki.util.CopyUtil;
 import com.wychmod.wiki.util.SnowFlake;
@@ -80,6 +82,23 @@ public class UserService {
     public void resetPassword(UserResetPasswordReq req) {
         User user = CopyUtil.copy(req, User.class);
         userMapper.updateByPrimaryKeySelective(user);
+    }
+
+    public UserLoginResp login(UserLoginReq req) {
+        User userDb = selectByLoginName(req.getLoginName());
+        if (ObjectUtils.isEmpty(userDb)) {
+            // 用户名不存在
+            LOG.info("用户名不存在，{}",req.getLoginName());
+            throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+        } else {
+            if (userDb.getPassword().equals(req.getPassword())) {
+                // 登陆成功
+                return CopyUtil.copy(userDb, UserLoginResp.class);
+            } else {
+                // 密码不对
+                throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+            }
+        }
     }
 
     public void delete(long id) {
