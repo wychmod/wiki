@@ -44,8 +44,8 @@
             </a-button>
             <a-popconfirm
                 title="删除后不可恢复，确认删除?"
-                cancel-text="否"
                 ok-text="是"
+                cancel-text="否"
                 @confirm="handleDelete(record.id)"
             >
               <a-button type="danger">
@@ -72,8 +72,8 @@
       <a-form-item label="昵称">
         <a-input v-model:value="user.name" />
       </a-form-item>
-      <a-form-item label="密码">
-        <a-input v-model:value="user.password" />
+      <a-form-item v-show="!user.id" label="密码">
+        <a-input v-model:value="user.password"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -84,6 +84,8 @@ import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 import {message} from "ant-design-vue";
 import {Tool} from "@/util/tool";
+declare let hexMd5: any;
+declare let KEY: any;
 export default defineComponent({
   name: 'AdminUser',
   setup() {
@@ -158,6 +160,7 @@ export default defineComponent({
     const modalLoading = ref(false);
     const handleModalOk = () => {
       modalLoading.value = true;
+      user.value.password=hexMd5(user.value.password+KEY)
       axios.post("/user/save", user.value).then((response) => {
         modalLoading.value = false;
         const data = response.data;
