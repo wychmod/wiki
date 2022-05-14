@@ -221,16 +221,7 @@ export default defineComponent({
       });
     };
     const level1 = ref();
-    let categorys: any
-    const getCategoryName = (cid: number) => {
-      let result = ""
-      categorys.forEach((item: any) => {
-        if (item.id === cid) {
-          result = item.name
-        }
-      })
-      return result
-    }
+
     // -------- 重置密码 ---------
     const resetModalVisible = ref(false);
     const resetModalLoading = ref(false);
@@ -274,7 +265,6 @@ export default defineComponent({
       param,
       handleTableChange,
       handleQuery,
-      getCategoryName,
       add,
       edit,
       handleDelete,
