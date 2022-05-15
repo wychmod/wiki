@@ -49,6 +49,9 @@ public class DocService {
     @Resource
     private WebSocketServer webSocketServe;
 
+    @Resource
+    private WsService wsService;
+
     public List<DocQueryResp> all(long ebookId) {
         DocExample docExample = new DocExample();
         docExample.createCriteria().andEbookIdEqualTo(ebookId);
@@ -136,7 +139,7 @@ public class DocService {
 
         //推送消息
         Doc docDb = docMapper.selectByPrimaryKey(id);
-        webSocketServe.sendInfo("【"+docDb.getName()+"】被点赞!");
+        wsService.sendInfo("【"+docDb.getName()+"】被点赞!");
     }
 
     public void updateEbookInfo(){
