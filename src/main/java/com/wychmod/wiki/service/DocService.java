@@ -18,6 +18,7 @@ import com.wychmod.wiki.util.CopyUtil;
 import com.wychmod.wiki.util.RedisUtil;
 import com.wychmod.wiki.util.RequestContext;
 import com.wychmod.wiki.util.SnowFlake;
+import com.wychmod.wiki.websocket.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,9 @@ public class DocService {
 
     @Resource
     private DocMapperCust docMapperCust;
+
+    @Resource
+    private WebSocketServer webSocketServe;
 
     public List<DocQueryResp> all(long ebookId) {
         DocExample docExample = new DocExample();
@@ -129,6 +133,10 @@ public class DocService {
         } else {
             throw new BusinessException(BusinessExceptionCode.VOTE_REPEAT);
         }
+
+        //推送消息
+        Doc docDb = docMapper.selectByPrimaryKey(id);
+        webSocketServe.sendInfo("【"+docDb.getName()+"】被点赞!");
     }
 
     public void updateEbookInfo(){
