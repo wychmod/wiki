@@ -30,7 +30,9 @@
           @change="handleTableChange"
       >
         <template #cover="{ text: cover }">
-          <img v-if="cover" :src="cover" alt="avatar"/>
+          <div class="my-img">
+            <img v-if="cover" :src="cover" alt="avatar"/>
+          </div>
         </template>
         <template v-slot:category="{text,record}">
           <span>{{ getCategoryName(record.category1Id) }}/{{ getCategoryName(record.category2Id) }}</span>
@@ -91,6 +93,7 @@ import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 import {message} from "ant-design-vue";
 import {Tool} from "@/util/tool";
+
 export default defineComponent({
   name: 'AdminEbook',
   setup() {
@@ -103,6 +106,7 @@ export default defineComponent({
       total: 0
     });
     const loading = ref(false);
+
     const columns = [
       {
         title: '封面',
@@ -135,6 +139,7 @@ export default defineComponent({
         slots: {customRender: 'action'}
       }
     ];
+
     /**
      * 数据查询
      **/
@@ -153,6 +158,7 @@ export default defineComponent({
         const data = response.data;
         if (data.success) {
           ebooks.value = data.content.list;
+
           // 重置分页按钮
           pagination.value.current = params.page;
           pagination.value.total = data.content.total;
@@ -161,16 +167,17 @@ export default defineComponent({
         }
       });
     };
+
     /**
      * 表格点击页码时触发
      */
     const handleTableChange = (pagination: any) => {
-      console.log("看看自带的分页参数都有啥：" + pagination);
       handleQuery({
         page: pagination.current,
         size: pagination.pageSize
       });
     };
+
     // -------- 表单 ---------
     const categoryIds = ref();
     const ebook = ref();
@@ -195,6 +202,7 @@ export default defineComponent({
         }
       });
     };
+
     /**
      * 编辑
      */
@@ -203,6 +211,7 @@ export default defineComponent({
       ebook.value = Tool.copy(record)
       categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
     };
+
     /**
      * 新增
      */
@@ -210,6 +219,7 @@ export default defineComponent({
       modalVisible.value = true;
       ebook.value = {}
     };
+
     /**
      * 删除
      */
@@ -237,10 +247,12 @@ export default defineComponent({
         const data = response.data;
         if (data.success) {
           categorys = data.content;
-          console.log("原始数组：", categorys);
+
+
           level1.value = [];
           level1.value = Tool.array2Tree(categorys, 0);
-          console.log("树形结构：", level1);
+
+
           //加载完分类后，再加载电子书，否则如果分类树加载很慢，则电子书渲染会报错
           handleQuery({
             page: 1,
@@ -254,15 +266,16 @@ export default defineComponent({
     const getCategoryName = (cid: number) => {
       let result = ""
       categorys.forEach((item: any) => {
-        if (item.id === cid) {
-          result = item.name
-        }
-      })
+            if (item.id === cid) {
+              result = item.name
+            }
+          })
       return result
     }
     onMounted(() => {
       handleQueryCategory()
     });
+
     return {
       ebooks,
       pagination,
@@ -272,9 +285,11 @@ export default defineComponent({
       handleTableChange,
       handleQuery,
       getCategoryName,
+
       add,
       edit,
       handleDelete,
+
       ebook,
       modalVisible,
       modalLoading,
@@ -285,3 +300,18 @@ export default defineComponent({
   }
 });
 </script>
+
+<style scoped>
+  .my-img{
+    width: 50px;
+    height: 50px;
+    display: table-cell;
+    vertical-align: middle;
+  }
+  img{
+    width: 50%;
+    height: 50%;
+  }
+</style>
+
+

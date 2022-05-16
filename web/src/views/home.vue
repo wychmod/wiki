@@ -7,8 +7,8 @@
           @click="handleClick"
       >
         <a-menu-item key="welcome">
-          <MailOutlined />
-          <span>欢迎</span>
+            <MailOutlined />
+            <span>欢迎</span>
         </a-menu-item>
         <a-sub-menu v-for="item in level1" :key="item.id">
           <template v-slot:title>
@@ -24,15 +24,23 @@
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
       <div v-show="isShowWelcome" class="welcome">
-        <h1>欢迎使用my-wiki</h1>
+        <the-welcome />
       </div>
       <a-list v-show="!isShowWelcome" :data-source="ebooks" :grid="{ gutter: 20, column: 3 }" item-layout="vertical" size="large">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
             <template #actions>
-              <span v-for="{ type, text } in actions" :key="type">
-                <component v-bind:is="type" style="margin-right: 8px" />
-                {{ text }}
+              <span>
+                <component v-bind:is="'FileOutlined'" style="margin-right: 8px" />
+                {{ item.docCount }}
+              </span>
+              <span>
+                <component v-bind:is="'UserOutlined'" style="margin-right: 8px" />
+                {{ item.viewCount }}
+              </span>
+              <span>
+                <component v-bind:is="'LikeOutlined'" style="margin-right: 8px" />
+                {{ item.voteCount }}
               </span>
             </template>
             <a-list-item-meta :description="item.description">
@@ -49,15 +57,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, reactive, toRef} from 'vue';
+import { defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 import { message } from 'ant-design-vue';
 import {Tool} from "@/util/tool";
-const listData: any = [];
+import TheWelcome from '@/components/the-welcome.vue';
+
+
 export default defineComponent({
   name: 'Home',
+  components:{TheWelcome},
   setup() {
     const ebooks = ref();
+    let categoryId2=0
     const level1 =  ref();
     let categorys: any;
     /**
@@ -68,10 +80,11 @@ export default defineComponent({
         const data = response.data;
         if (data.success) {
           categorys = data.content;
-          console.log("原始数组：", categorys);
+
+
           level1.value = [];
           level1.value = Tool.array2Tree(categorys, 0);
-          console.log("树形结构：", level1.value);
+
         } else {
           message.error(data.message);
         }
@@ -90,7 +103,7 @@ export default defineComponent({
       });
     }
     const isShowWelcome=ref(true)
-    let categoryId2=0
+
     const handleClick = (value:any) => {
       if (value.key === 'welcome') {
         isShowWelcome.value = true;
@@ -98,26 +111,26 @@ export default defineComponent({
         categoryId2=value.key
         isShowWelcome.value = false;
         handleQueryEbook()
+
       }
     };
+
+
     onMounted(() => {
       handleQueryCategory();
       // handleQueryEbook()
     });
+
     return {
       isShowWelcome,
       ebooks,
       pagination: {
         onChange: (page: any) => {
-          console.log(page);
+          console.log(page)
         },
         pageSize: 3,
       },
-      actions: [
-        { type: 'StarOutlined', text: '156' },
-        { type: 'LikeOutlined', text: '156' },
-        { type: 'MessageOutlined', text: '2' },
-      ],
+
       handleClick,
       level1,
     }
@@ -125,12 +138,3 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-.ant-avatar {
-  width: 50px;
-  height: 50px;
-  line-height: 50px;
-  border-radius: 8%;
-  margin: 5px 0;
-}
-</style>

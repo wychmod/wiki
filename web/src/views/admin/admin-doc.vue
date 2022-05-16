@@ -99,40 +99,37 @@
     </a-layout-content>
   </a-layout>
 
-  <!--  <a-modal-->
-  <!--      title="文档表单"-->
-  <!--      v-model:visible="modalVisible"-->
-  <!--      :confirm-loading="modalLoading"-->
-  <!--      @ok="handleModalOk"-->
-  <!--  >-->
-  <!--  </a-modal>-->
+<!--  <a-modal-->
+<!--      title="文档表单"-->
+<!--      v-model:visible="modalVisible"-->
+<!--      :confirm-loading="modalLoading"-->
+<!--      @ok="handleModalOk"-->
+<!--  >-->
+<!--  </a-modal>-->
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, createVNode} from 'vue';
+import {createVNode, defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
-import { message, Modal } from "ant-design-vue";
+import {message, Modal} from "ant-design-vue";
 import {Tool} from "@/util/tool";
 import {useRoute} from "vue-router";
 import ExclamationCircleOutlined from "@ant-design/icons-vue/ExclamationCircleOutlined";
 import E from 'wangeditor'
+
+
 export default defineComponent({
   name: 'AdminDoc',
   setup() {
     const route = useRoute();
-    console.log("路由：", route);
-    console.log("route.path：", route.path);
-    console.log("route.query：", route.query);
-    console.log("route.param：", route.params);
-    console.log("route.fullPath：", route.fullPath);
-    console.log("route.name：", route.name);
-    console.log("route.meta：", route.meta);
     const param = ref();
     param.value = {};
     const docs = ref();
     const loading = ref(false);
     const treeSelectData = ref();
     treeSelectData.value = [];
+
+
     const columns = [
       {
         title: '名称',
@@ -145,6 +142,7 @@ export default defineComponent({
         slots: { customRender: 'action' }
       }
     ];
+
     /**
      * 一级文档树，children属性就是二级文档
      * [{
@@ -170,10 +168,12 @@ export default defineComponent({
         const data = response.data;
         if (data.success) {
           docs.value = data.content;
-          console.log("原始数组：", docs.value);
+
+
           level1.value = [];
           level1.value = Tool.array2Tree(docs.value, 0);
-          console.log("树形结构：", level1);
+
+
           //父文档下拉框初始化，相当于点击新增
           treeSelectData.value=Tool.copy(level1.value)
           //为选择树添加一个“无”
@@ -183,7 +183,10 @@ export default defineComponent({
         }
       });
     };
+
+
     // -------- 表单 ---------
+
     const doc = ref();
     doc.value={
       ebookId:route.query.ebookId
@@ -192,6 +195,7 @@ export default defineComponent({
     const modalLoading = ref(false);
     const editor = new E('#content')
     editor.config.zIndex=0
+
     const handleSave = () => {
       modalLoading.value = true;
       doc.value.content=editor.txt.html()
@@ -211,15 +215,16 @@ export default defineComponent({
      * 将某节点及其子孙节点全部置为disabled
      */
     const setDisable = (treeSelectData: any, id: any) => {
-      // console.log(treeSelectData, id);
+
       // 遍历数组，即遍历某一层节点
       for (let i = 0; i < treeSelectData.length; i++) {
         const node = treeSelectData[i];
         if (node.id === id) {
           // 如果当前节点就是目标节点
-          console.log("disabled", node);
+
           // 将目标节点设置为disabled
           node.disabled = true;
+
           // 遍历所有子节点，将所有子节点全部都加上disabled
           const children = node.children;
           if (Tool.isNotEmpty(children)) {
@@ -236,23 +241,27 @@ export default defineComponent({
         }
       }
     };
+
     const deleteIds: Array<string> = [];
     const deleteNames: Array<string> = [];
+
+
     /**
      * 查找整根树枝
      */
     const getDeleteIds = (treeSelectData: any, id: any) => {
-      // console.log(treeSelectData, id);
+
       // 遍历数组，即遍历某一层节点
       for (let i = 0; i < treeSelectData.length; i++) {
         const node = treeSelectData[i];
         if (node.id === id) {
           // 如果当前节点就是目标节点
-          console.log("delete", node);
+
           // 将目标ID放入结果集deleteIds
           // node.disabled = true;
           deleteIds.push(id);
           deleteNames.push(node.name);
+
           // 遍历所有子节点
           const children = node.children;
           if (Tool.isNotEmpty(children)) {
@@ -269,6 +278,7 @@ export default defineComponent({
         }
       }
     };
+
     /**
      * 内容查询
      **/
@@ -291,11 +301,14 @@ export default defineComponent({
       doc.value = Tool.copy(record);
       handleQueryContent()
       // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
-      treeSelectData.value = Tool.copy(level1.value);
+      treeSelectData.value = Tool.copy(level1.value)||[];
       setDisable(treeSelectData.value, record.id);
+
       // 为选择树添加一个"无"
       treeSelectData.value.unshift({id: 0, name: '无'});
+
     };
+
     /**
      * 新增
      */
@@ -304,10 +317,14 @@ export default defineComponent({
       doc.value = {
         ebookId: route.query.ebookId
       };
-      treeSelectData.value = Tool.copy(level1.value);
+
+      treeSelectData.value = Tool.copy(level1.value)||[];
+
       // 为选择树添加一个"无"
       treeSelectData.value.unshift({id: 0, name: '无'});
+
     };
+
     /**
      * 删除
      */
@@ -322,7 +339,7 @@ export default defineComponent({
         icon: createVNode(ExclamationCircleOutlined),
         content: '将删除：【' + deleteNames.join("，") + "】删除后不可恢复，确认删除？",
         onOk() {
-          console.log(deleteIds)
+          // console.log(ids)
           axios.delete("/doc/delete/" + deleteIds.join(",")).then((response) => {
             const data = response.data; // data = commonResp
             if (data.success) {
@@ -334,21 +351,23 @@ export default defineComponent({
         },
       });
     };
+
     //-------------------富文本预览--------------------
     const drawerVisible=ref(false)
     const previewHtml=ref()
     const handlePreviewContent=()=>{
-      const html=editor.txt.html()
-      previewHtml.value=html
+      previewHtml.value=editor.txt.html()
       drawerVisible.value=true
     }
     const onDrawerClose=()=>{
       drawerVisible.value=false
     }
+
     onMounted(() => {
       handleQuery();
       editor.create()
     });
+
     return {
       param,
       // docs,
@@ -356,14 +375,19 @@ export default defineComponent({
       columns,
       loading,
       handleQuery,
+
       edit,
       add,
+
       doc,
       modalVisible,
       modalLoading,
       handleSave,
+
       handleDelete,
+
       treeSelectData,
+
       drawerVisible,
       previewHtml,
       handlePreviewContent,

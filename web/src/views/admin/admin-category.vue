@@ -32,8 +32,8 @@
             </a-button>
             <a-popconfirm
                 title="删除后不可恢复，确认删除?"
-                cancel-text="否"
                 ok-text="是"
+                cancel-text="否"
                 @confirm="handleDelete(record.id)"
             >
               <a-button type="danger">
@@ -59,8 +59,8 @@
       </a-form-item>
       <a-form-item label="父分类">
         <a-select
-            ref="select"
             v-model:value="category.parent"
+            ref="select"
         >
           <a-select-option value="0">无</a-select-option>
           <a-select-option v-for="c in level1" :key="c.id" :disabled="category.id===c.id" :value="c.id">{{ c.name }}</a-select-option>
@@ -78,6 +78,7 @@ import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 import {message} from "ant-design-vue";
 import {Tool} from "@/util/tool";
+
 export default defineComponent({
   name: 'AdminCategory',
   setup() {
@@ -85,7 +86,9 @@ export default defineComponent({
     const level1 = ref();
     param.value = {};
     const categorys = ref();
+
     const loading = ref(false);
+
     const columns = [
       {
         title: '名称',
@@ -106,6 +109,7 @@ export default defineComponent({
         slots: {customRender: 'action'}
       }
     ];
+
     /**
      * 数据查询
      **/
@@ -117,15 +121,18 @@ export default defineComponent({
         const data = response.data;
         if (data.success) {
           categorys.value = data.content;
-          console.log("原始数组",categorys.value)
+
+
           level1.value = []
           level1.value=Tool.array2Tree(categorys.value,0)
-          console.log("树形结构：",level1)
+
         } else {
           message.error(data.message)
         }
       });
     };
+
+
     // -------- 表单 ---------
     const category = ref({})
     const modalVisible = ref(false);
@@ -144,6 +151,7 @@ export default defineComponent({
         }
       });
     };
+
     /**
      * 编辑
      */
@@ -151,6 +159,7 @@ export default defineComponent({
       modalVisible.value = true;
       category.value = Tool.copy(record)
     };
+
     /**
      * 新增
      */
@@ -158,6 +167,7 @@ export default defineComponent({
       modalVisible.value = true;
       category.value = {}
     };
+
     /**
      * 删除
      */
@@ -170,9 +180,11 @@ export default defineComponent({
         }
       });
     };
+
     onMounted(() => {
       handleQuery();
     });
+
     return {
       categorys,
       columns,
@@ -180,9 +192,11 @@ export default defineComponent({
       param,
       level1,
       handleQuery,
+
       add,
       edit,
       handleDelete,
+
       category,
       modalVisible,
       modalLoading,
@@ -191,3 +205,8 @@ export default defineComponent({
   }
 });
 </script>
+
+
+
+
+

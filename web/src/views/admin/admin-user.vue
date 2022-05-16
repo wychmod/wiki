@@ -29,14 +29,6 @@
           :loading="loading"
           @change="handleTableChange"
       >
-        <template #cover="{ text: cover }">
-          <div class="myimg">
-            <img v-if="cover" :src="cover" alt="avatar"/>
-          </div>
-        </template>
-        <template v-slot:category="{text,record}">
-          <span>{{ getCategoryName(record.category1Id) }}/{{ getCategoryName(record.category2Id) }}</span>
-        </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
             <a-button type="primary" @click="resetPassword(record)">
@@ -81,12 +73,12 @@
     </a-form>
   </a-modal>
   <a-modal
+      title="重置密码"
       v-model:visible="resetModalVisible"
       :confirm-loading="resetModalLoading"
-      title="重置密码"
       @ok="handleResetModalOk"
   >
-    <a-form :label-col="{ spran: 6 }" :model="user" :wrapper-col="{ span: 18 }">
+    <a-form :label-col="{ span: 6 }" :model="user" :wrapper-col="{ span: 18 }">
 
       <a-form-item label="新密码" >
         <a-input v-model:value="user.password"/>
@@ -100,8 +92,10 @@ import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 import {message} from "ant-design-vue";
 import {Tool} from "@/util/tool";
+
 declare let hexMd5: any;
 declare let KEY: any;
+
 export default defineComponent({
   name: 'AdminUser',
   setup() {
@@ -114,6 +108,7 @@ export default defineComponent({
       total: 0
     });
     const loading = ref(false);
+
     const columns = [
       {
         title: '登陆名',
@@ -133,6 +128,7 @@ export default defineComponent({
         slots: { customRender: 'action' }
       }
     ];
+
     /**
      * 数据查询
      **/
@@ -151,6 +147,7 @@ export default defineComponent({
         const data = response.data;
         if (data.success) {
           users.value = data.content.list;
+
           // 重置分页按钮
           pagination.value.current = params.page;
           pagination.value.total = data.content.total;
@@ -159,23 +156,26 @@ export default defineComponent({
         }
       });
     };
+
     /**
      * 表格点击页码时触发
      */
     const handleTableChange = (pagination: any) => {
-      console.log("看看自带的分页参数都有啥：" + pagination);
       handleQuery({
         page: pagination.current,
         size: pagination.pageSize
       });
     };
+
     // -------- 表单 ---------
     const user = ref();
     const modalVisible = ref(false);
     const modalLoading = ref(false);
     const handleModalOk = () => {
       modalLoading.value = true;
+
       user.value.password=hexMd5(user.value.password+KEY)
+
       axios.post("/user/save", user.value).then((response) => {
         modalLoading.value = false;
         const data = response.data;
@@ -191,6 +191,7 @@ export default defineComponent({
         }
       });
     };
+
     /**
      * 编辑
      */
@@ -198,6 +199,7 @@ export default defineComponent({
       modalVisible.value = true;
       user.value = Tool.copy(record)
     };
+
     /**
      * 新增
      */
@@ -205,6 +207,7 @@ export default defineComponent({
       modalVisible.value = true;
       user.value = {}
     };
+
     /**
      * 删除
      */
@@ -222,12 +225,15 @@ export default defineComponent({
     };
     const level1 = ref();
 
+
     // -------- 重置密码 ---------
     const resetModalVisible = ref(false);
     const resetModalLoading = ref(false);
     const handleResetModalOk = () => {
       resetModalLoading.value = true;
+
       user.value.password=hexMd5(user.value.password+KEY)
+
       axios.post("/user/reset-password", user.value).then((response) => {
         resetModalLoading.value = false;
         const data = response.data;
@@ -243,6 +249,7 @@ export default defineComponent({
         }
       });
     };
+
     /**
      * 重置密码
      */
@@ -251,12 +258,14 @@ export default defineComponent({
       user.value = Tool.copy(record)
       user.value.password=null
     };
+
     onMounted(() => {
       handleQuery({
         pageNum: 1,
         pageSize: pagination.value.pageSize,
       });
     });
+
     return {
       users,
       pagination,
@@ -265,30 +274,29 @@ export default defineComponent({
       param,
       handleTableChange,
       handleQuery,
+
       add,
       edit,
       handleDelete,
+
       user,
       modalVisible,
       modalLoading,
       handleModalOk,
       level1,
+
       resetModalVisible,
       resetModalLoading,
       handleResetModalOk,
       resetPassword,
+
+
+
     }
   }
 });
 </script>
 
-<style scoped>
-.myimg {
-  width: 15%;
-  height: 15%;
-}
-img {
-  width: 100%;
-  height: 100%;
-}
-</style>
+
+
+
